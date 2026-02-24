@@ -52,7 +52,38 @@ export default function ProjectUpload() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
 
-      // 1. Upload files to Supabase Storage
+      // 1. Get or create portfolio
+      let portfolioId;
+      const { data: portfolio } = await (supabase as any)
+        .from('portfolios')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (portfolio) {
+        portfolioId = portfolio.id;
+      } else {
+        // Create default portfolio
+        // Need to fetch username first to generate slug
+        const { data: profile } = await (supabase as any).from('profiles').select('username').eq('id', user.id).single();
+        const slug = profile?.username || `user-${user.id.slice(0, 8)}`;
+        
+        const { data: newPortfolio, error: portfolioError } = await (supabase as any)
+          .from('portfolios')
+          .insert({
+            user_id: user.id,
+            title: "Mon Portfolio",
+            slug: slug,
+            is_published: true
+          })
+          .select()
+          .single();
+        
+        if (portfolioError) throw portfolioError;
+        portfolioId = newPortfolio.id;
+      }
+
+      // 2. Upload files to Supabase Storage
       const mediaUrls: string[] = [];
       for (const file of files) {
         const fileExt = file.name.split('.').pop();
@@ -72,20 +103,22 @@ export default function ProjectUpload() {
         mediaUrls.push(publicUrl);
       }
 
-      // 2. Insert project into database
+      // 3. Insert project into database
       const tagsArray = data.tags.split(",").map(s => s.trim()).filter(Boolean);
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('projects')
         .insert({
+          portfolio_id: portfolioId,
           user_id: user.id,
           title: data.title,
           description: data.description,
           category: data.category,
-          tags: tagsArray,
+          // tags: tagsArray, // Tags not in schema yet, need to add or ignore
           drive_link: data.drive_link,
-          media_urls: mediaUrls,
-          cover_url: mediaUrls[0] || null, // Use first image as cover
+          image_url: mediaUrls[0] || null, // Map to image_url
+          project_url: data.drive_link, // Map drive_link to project_url for now or add column
+          cover_url: mediaUrls[0] || null,
           created_at: new Date().toISOString(),
         });
 

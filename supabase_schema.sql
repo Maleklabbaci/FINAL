@@ -13,6 +13,7 @@ create table public.profiles (
   city text,
   skills text[],
   whatsapp text,
+  role text default 'user',
   updated_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   constraint username_length check (char_length(username) >= 3)

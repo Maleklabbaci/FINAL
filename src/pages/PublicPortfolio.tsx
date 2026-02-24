@@ -22,7 +22,7 @@ export default function PublicPortfolio() {
       setLoading(true);
       try {
         // Fetch profile
-        const { data: profileData, error: profileError } = await supabase
+        const { data: profileData, error: profileError } = await (supabase as any)
           .from('profiles')
           .select('*')
           .eq('username', username)
@@ -33,7 +33,7 @@ export default function PublicPortfolio() {
 
         // Fetch projects
         if (profileData) {
-          const { data: projectsData, error: projectsError } = await supabase
+          const { data: projectsData, error: projectsError } = await (supabase as any)
             .from('projects')
             .select('*')
             .eq('user_id', profileData.id) // Use profileData.id instead of user_id as per schema

@@ -21,6 +21,7 @@ export interface Database {
           city: string | null
           skills: string[] | null
           whatsapp: string | null
+          role: string | null
           updated_at: string | null
           created_at: string
         }

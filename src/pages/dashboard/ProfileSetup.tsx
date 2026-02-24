@@ -50,10 +50,10 @@ export default function ProfileSetup() {
       setUser(user);
       if (user) {
         // Fetch profile if exists
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('profiles')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single();
         
         if (data) {
@@ -73,10 +73,10 @@ export default function ProfileSetup() {
     try {
       const skillsArray = data.skills.split(",").map(s => s.trim()).filter(Boolean);
       
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .upsert({
-          user_id: user.id,
+          id: user.id,
           full_name: data.full_name,
           username: data.username,
           bio: data.bio,

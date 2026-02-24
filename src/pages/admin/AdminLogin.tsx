@@ -10,7 +10,7 @@ export default function AdminLogin() {
 
   const handleLogin = (e: FormEvent) => {
     e.preventDefault();
-    if (password === "admin123") { // Hardcoded for demo purposes
+    if (password === "12admin34") { // Hardcoded for demo purposes
       localStorage.setItem("admin_auth", "true");
       navigate("/admin/overview");
     } else {
