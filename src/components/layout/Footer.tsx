@@ -16,11 +16,16 @@ export function Footer() {
           </div>
           
           <div>
-            <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Plateforme</h3>
+            <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Navigation</h3>
             <ul className="mt-4 space-y-4">
               <li>
+                <Link to="/" className="text-base text-gray-500 hover:text-primary">
+                  Accueil
+                </Link>
+              </li>
+              <li>
                 <Link to="/explorer" className="text-base text-gray-500 hover:text-primary">
-                  Explorer les talents
+                  Explorer
                 </Link>
               </li>
               <li>
@@ -28,30 +33,20 @@ export function Footer() {
                   Tarifs
                 </Link>
               </li>
-              <li>
-                <Link to="/features" className="text-base text-gray-500 hover:text-primary">
-                  Fonctionnalités
-                </Link>
-              </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Support</h3>
+            <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Légal</h3>
             <ul className="mt-4 space-y-4">
-              <li>
-                <Link to="/help" className="text-base text-gray-500 hover:text-primary">
-                  Centre d'aide
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-base text-gray-500 hover:text-primary">
-                  Nous contacter
-                </Link>
-              </li>
               <li>
                 <Link to="/terms" className="text-base text-gray-500 hover:text-primary">
                   Conditions d'utilisation
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="text-base text-gray-500 hover:text-primary">
+                  Politique de confidentialité
                 </Link>
               </li>
             </ul>
@@ -81,7 +76,7 @@ export function Footer() {
         </div>
         <div className="mt-8 border-t border-gray-200 pt-8">
           <p className="text-base text-gray-400 text-center">
-            &copy; {new Date().getFullYear()} Portfola. Tous droits réservés. Fait avec ❤️ en Algérie.
+            &copy; 2025 Portfola. Tous droits réservés.
           </p>
         </div>
       </div>

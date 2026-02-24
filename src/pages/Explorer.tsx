@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Link } from "react-router-dom";
 import { CATEGORIES, ALGERIAN_CITIES } from "@/constants";
+import * as React from "react";
 
 export default function Explorer() {
   const [profiles, setProfiles] = useState<any[]>([]);

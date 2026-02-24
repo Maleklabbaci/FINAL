@@ -25,10 +25,10 @@ export function Navbar() {
             </Link>
             <div className="flex items-center space-x-4">
               <Link to="/login">
-                <Button variant="ghost">Se connecter</Button>
+                <Button variant="ghost" className="text-gray-600 hover:text-primary">Se connecter</Button>
               </Link>
               <Link to="/signup">
-                <Button>S'inscrire</Button>
+                <Button className="bg-primary hover:bg-primary/90 text-white rounded-full px-6">Commencer gratuitement</Button>
               </Link>
             </div>
           </div>
@@ -67,7 +67,7 @@ export function Navbar() {
                 <Button variant="ghost" className="w-full justify-start">Se connecter</Button>
               </Link>
               <Link to="/signup" onClick={() => setIsOpen(false)}>
-                <Button className="w-full justify-start">S'inscrire</Button>
+                <Button className="w-full justify-start bg-primary text-white hover:bg-primary/90">Commencer gratuitement</Button>
               </Link>
             </div>
           </div>
