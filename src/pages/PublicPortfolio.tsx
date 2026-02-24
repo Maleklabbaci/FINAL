@@ -5,11 +5,15 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Link as LinkIcon, Mail, Phone, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { Database } from "@/types/database.types";
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
+type Project = Database['public']['Tables']['projects']['Row'];
 
 export default function PublicPortfolio() {
   const { username } = useParams();
-  const [profile, setProfile] = useState<any>(null);
-  const [projects, setProjects] = useState<any[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,7 +36,7 @@ export default function PublicPortfolio() {
           const { data: projectsData, error: projectsError } = await supabase
             .from('projects')
             .select('*')
-            .eq('user_id', profileData.user_id)
+            .eq('user_id', profileData.id) // Use profileData.id instead of user_id as per schema
             .order('created_at', { ascending: false });
           
           if (projectsError) throw projectsError;

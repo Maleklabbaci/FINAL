@@ -8,9 +8,12 @@ import { supabase } from "@/lib/supabase";
 import { Link } from "react-router-dom";
 import { CATEGORIES, ALGERIAN_CITIES } from "@/constants";
 import * as React from "react";
+import { Database } from "@/types/database.types";
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export default function Explorer() {
-  const [profiles, setProfiles] = useState<any[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
