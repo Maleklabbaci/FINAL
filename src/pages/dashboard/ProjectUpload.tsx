@@ -102,104 +102,124 @@ export default function ProjectUpload() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="max-w-3xl mx-auto space-y-10">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Ajouter un projet</h1>
-        <p className="text-gray-500">Partagez vos meilleures réalisations avec le monde.</p>
+        <h1 className="text-4xl font-extrabold text-dark mb-2 tracking-tight">Ajouter un projet</h1>
+        <p className="text-gray-500 text-lg">Partagez vos meilleures réalisations avec le monde.</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Détails du projet</CardTitle>
+      <Card className="border-0 shadow-xl shadow-gray-200/50 rounded-3xl overflow-hidden">
+        <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-8">
+          <CardTitle className="text-xl font-bold text-dark">Détails du projet</CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <CardContent className="p-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Titre du projet</label>
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-gray-700 ml-1">Titre du projet</label>
               <input
                 {...form.register("title")}
-                className="w-full px-3 py-2 border rounded-md"
+                className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400"
                 placeholder="Mon super projet"
               />
               {form.formState.errors.title && (
-                <p className="text-red-500 text-xs">{form.formState.errors.title.message}</p>
+                <p className="text-red-500 text-xs ml-1">{form.formState.errors.title.message}</p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Description</label>
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-gray-700 ml-1">Description</label>
               <textarea
                 {...form.register("description")}
-                className="w-full px-3 py-2 border rounded-md h-32"
+                className="w-full px-5 py-4 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400 min-h-[150px] resize-none"
                 placeholder="Décrivez le contexte, les défis et les résultats..."
               />
               {form.formState.errors.description && (
-                <p className="text-red-500 text-xs">{form.formState.errors.description.message}</p>
+                <p className="text-red-500 text-xs ml-1">{form.formState.errors.description.message}</p>
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Catégorie</label>
-                <select {...form.register("category")} className="w-full px-3 py-2 border rounded-md bg-white">
-                  {CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Catégorie</label>
+                <div className="relative">
+                  <select {...form.register("category")} className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl appearance-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 cursor-pointer">
+                    {CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">▼</div>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Tags (séparés par des virgules)</label>
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Tags (séparés par des virgules)</label>
                 <input
                   {...form.register("tags")}
-                  className="w-full px-3 py-2 border rounded-md"
+                  className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400"
                   placeholder="UI Design, Figma, React..."
                 />
               </div>
             </div>
 
-            <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-medium text-gray-900">Médias</h3>
+            <div className="space-y-6 pt-8 border-t border-gray-100">
+              <h3 className="text-lg font-bold text-dark">Médias</h3>
               
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
+              <div className="border-2 border-dashed border-gray-200 rounded-3xl p-10 text-center hover:border-primary hover:bg-primary/5 transition-all duration-300 cursor-pointer relative group">
                 <input 
                   type="file" 
                   multiple 
                   accept="image/*,video/*" 
                   onChange={handleFileChange}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
-                <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                <p className="mt-2 text-sm text-gray-600">Glissez-déposez vos fichiers ici ou cliquez pour parcourir</p>
-                <p className="text-xs text-gray-500 mt-1">PNG, JPG, MP4 jusqu'à 10MB</p>
+                <div className="bg-primary/10 h-20 w-20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Upload className="h-10 w-10 text-primary" />
+                </div>
+                <p className="mt-2 text-lg font-medium text-gray-900">Glissez-déposez vos fichiers ici</p>
+                <p className="text-sm text-gray-500 mt-2">ou cliquez pour parcourir</p>
+                <p className="text-xs text-gray-400 mt-4 font-medium uppercase tracking-wide">PNG, JPG, MP4 jusqu'à 10MB</p>
               </div>
 
               {files.length > 0 && (
-                <div className="space-y-2">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {files.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded-md">
-                      <span className="text-sm truncate max-w-[200px]">{file.name}</span>
-                      <Button type="button" variant="ghost" size="sm" onClick={() => removeFile(index)}>
-                        <X className="h-4 w-4" />
-                      </Button>
+                    <div key={index} className="relative group bg-gray-50 p-3 rounded-xl border border-gray-100">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-10 w-10 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                          {/* Preview if image */}
+                          {file.type.startsWith('image/') ? (
+                            <img src={URL.createObjectURL(file)} alt="preview" className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-xs text-gray-500">FILE</div>
+                          )}
+                        </div>
+                        <span className="text-sm font-medium text-gray-700 truncate flex-1">{file.name}</span>
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={() => removeFile(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Lien Google Drive (Optionnel)</label>
+              <div className="space-y-3 pt-4">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Lien Google Drive (Optionnel)</label>
                 <input
                   {...form.register("drive_link")}
-                  className="w-full px-3 py-2 border rounded-md"
+                  className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400"
                   placeholder="https://drive.google.com/..."
                 />
               </div>
             </div>
 
             <div className="flex justify-end pt-6">
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" size="lg" className="px-8 py-6 text-lg font-bold shadow-lg shadow-primary/20 rounded-full" disabled={loading}>
                 {loading ? "Publication..." : "Publier le projet"}
               </Button>
             </div>

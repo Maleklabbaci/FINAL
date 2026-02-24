@@ -102,115 +102,123 @@ export default function ProfileSetup() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="max-w-3xl mx-auto space-y-10">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Mon Profil</h1>
-        <p className="text-gray-500">Gérez vos informations personnelles et professionnelles.</p>
+        <h1 className="text-4xl font-extrabold text-dark mb-2 tracking-tight">Mon Profil</h1>
+        <p className="text-gray-500 text-lg">Gérez vos informations personnelles et professionnelles pour attirer plus de clients.</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Informations de base</CardTitle>
+      <Card className="border-0 shadow-xl shadow-gray-200/50 rounded-3xl overflow-hidden">
+        <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-8">
+          <CardTitle className="text-xl font-bold text-dark">Informations de base</CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <CardContent className="p-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Nom complet</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Nom complet</label>
                 <input
                   {...form.register("full_name")}
-                  className="w-full px-3 py-2 border rounded-md"
+                  className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400"
                   placeholder="John Doe"
                 />
                 {form.formState.errors.full_name && (
-                  <p className="text-red-500 text-xs">{form.formState.errors.full_name.message}</p>
+                  <p className="text-red-500 text-xs ml-1">{form.formState.errors.full_name.message}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Nom d'utilisateur</label>
-                <div className="flex items-center">
-                  <span className="bg-gray-100 border border-r-0 rounded-l-md px-3 py-2 text-gray-500 text-sm">portfola.dz/</span>
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Nom d'utilisateur</label>
+                <div className="flex items-center group">
+                  <span className="bg-gray-100 border-0 rounded-l-xl px-4 py-3 text-gray-500 text-sm font-medium group-focus-within:bg-primary/5 group-focus-within:text-primary transition-colors">portfola.dz/</span>
                   <input
                     {...form.register("username")}
-                    className="w-full px-3 py-2 border rounded-r-md"
+                    className="w-full px-5 py-3 bg-gray-50 border-0 rounded-r-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400"
                     placeholder="johndoe"
                   />
                 </div>
                 {form.formState.errors.username && (
-                  <p className="text-red-500 text-xs">{form.formState.errors.username.message}</p>
+                  <p className="text-red-500 text-xs ml-1">{form.formState.errors.username.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Bio</label>
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-gray-700 ml-1">Bio</label>
               <textarea
                 {...form.register("bio")}
-                className="w-full px-3 py-2 border rounded-md h-24"
+                className="w-full px-5 py-4 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400 min-h-[120px] resize-none"
                 placeholder="Décrivez-vous en quelques mots..."
               />
-              <p className="text-xs text-gray-500 text-right">{(form.watch("bio") || "").length}/300</p>
-              {form.formState.errors.bio && (
-                <p className="text-red-500 text-xs">{form.formState.errors.bio.message}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Catégorie</label>
-                <select {...form.register("category")} className="w-full px-3 py-2 border rounded-md bg-white">
-                  {CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Ville</label>
-                <select {...form.register("city")} className="w-full px-3 py-2 border rounded-md bg-white">
-                  {ALGERIAN_CITIES.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
+              <div className="flex justify-between items-center px-1">
+                {form.formState.errors.bio ? (
+                  <p className="text-red-500 text-xs">{form.formState.errors.bio.message}</p>
+                ) : <span></span>}
+                <p className="text-xs text-gray-400 font-medium">{(form.watch("bio") || "").length}/300</p>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Compétences (séparées par des virgules)</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Catégorie</label>
+                <div className="relative">
+                  <select {...form.register("category")} className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl appearance-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 cursor-pointer">
+                    {CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">▼</div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Ville</label>
+                <div className="relative">
+                  <select {...form.register("city")} className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl appearance-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 cursor-pointer">
+                    {ALGERIAN_CITIES.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">▼</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-gray-700 ml-1">Compétences (séparées par des virgules)</label>
               <input
                 {...form.register("skills")}
-                className="w-full px-3 py-2 border rounded-md"
+                className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400"
                 placeholder="React, Photoshop, Marketing Digital..."
               />
             </div>
 
-            <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-medium text-gray-900">Réseaux Sociaux & Contact</h3>
+            <div className="space-y-6 pt-8 border-t border-gray-100">
+              <h3 className="text-lg font-bold text-dark">Réseaux Sociaux & Contact</h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">WhatsApp</label>
-                  <input {...form.register("whatsapp")} className="w-full px-3 py-2 border rounded-md" placeholder="+213..." />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-700 ml-1">WhatsApp</label>
+                  <input {...form.register("whatsapp")} className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400" placeholder="+213..." />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">LinkedIn</label>
-                  <input {...form.register("linkedin")} className="w-full px-3 py-2 border rounded-md" placeholder="https://linkedin.com/in/..." />
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-700 ml-1">LinkedIn</label>
+                  <input {...form.register("linkedin")} className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400" placeholder="https://linkedin.com/in/..." />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Behance</label>
-                  <input {...form.register("behance")} className="w-full px-3 py-2 border rounded-md" placeholder="https://behance.net/..." />
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-700 ml-1">Behance</label>
+                  <input {...form.register("behance")} className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400" placeholder="https://behance.net/..." />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Instagram</label>
-                  <input {...form.register("instagram")} className="w-full px-3 py-2 border rounded-md" placeholder="https://instagram.com/..." />
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-700 ml-1">Instagram</label>
+                  <input {...form.register("instagram")} className="w-full px-5 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all outline-none font-medium text-gray-700 placeholder:text-gray-400" placeholder="https://instagram.com/..." />
                 </div>
               </div>
             </div>
 
             <div className="flex justify-end pt-6">
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" size="lg" className="px-8 py-6 text-lg font-bold shadow-lg shadow-primary/20 rounded-full" disabled={loading}>
                 {loading ? "Enregistrement..." : "Enregistrer les modifications"}
               </Button>
             </div>

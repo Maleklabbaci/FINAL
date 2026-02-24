@@ -7,28 +7,28 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="border-b bg-white/80 backdrop-blur-md sticky top-0 z-50">
+    <nav className="glass-nav sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
+        <div className="flex justify-between h-20 items-center">
           <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="text-2xl font-bold text-primary">
+            <Link to="/" className="text-2xl font-extrabold text-primary tracking-tight hover:scale-105 transition-transform">
               Portfola
             </Link>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/explorer" className="text-gray-600 hover:text-primary transition-colors">
+            <Link to="/explorer" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
               Explorer
             </Link>
-            <Link to="/pricing" className="text-gray-600 hover:text-primary transition-colors">
+            <Link to="/pricing" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
               Tarifs
             </Link>
             <div className="flex items-center space-x-4">
               <Link to="/login">
-                <Button variant="ghost" className="text-gray-600 hover:text-primary">Se connecter</Button>
+                <Button variant="ghost" className="text-gray-600 hover:text-primary font-medium">Se connecter</Button>
               </Link>
               <Link to="/signup">
-                <Button className="bg-primary hover:bg-primary/90 text-white rounded-full px-6">Commencer gratuitement</Button>
+                <Button className="bg-primary hover:bg-primary/90 text-white rounded-full px-6 shadow-lg shadow-primary/25 hover:shadow-primary/40">Commencer gratuitement</Button>
               </Link>
             </div>
           </div>
