@@ -10,10 +10,15 @@ export default function AdminLogin() {
 
   const handleLogin = (e: FormEvent) => {
     e.preventDefault();
-    if (password === "12admin34") { // Hardcoded for demo purposes
+    console.log("Attempting login with:", password);
+    
+    if (password === "12admin34") { 
+      console.log("Login successful");
       localStorage.setItem("admin_auth", "true");
-      navigate("/admin/overview");
+      // Use window.location to force a full reload/navigation if navigate fails
+      window.location.href = "/admin/overview"; 
     } else {
+      console.log("Login failed");
       setError("Mot de passe incorrect");
     }
   };

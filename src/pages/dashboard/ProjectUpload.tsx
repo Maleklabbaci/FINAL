@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CATEGORIES } from "@/constants";
 import { supabase } from "@/lib/supabase";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Upload, X } from "lucide-react";
 import * as React from "react";
 
@@ -21,8 +21,10 @@ const projectSchema = z.object({
 type ProjectFormValues = z.infer<typeof projectSchema>;
 
 export default function ProjectUpload() {
+  const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const navigate = useNavigate();
 
   const form = useForm<ProjectFormValues>({
@@ -36,6 +38,41 @@ export default function ProjectUpload() {
     },
   });
 
+  useEffect(() => {
+    if (id) {
+      const fetchProject = async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('projects')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching project:", error);
+          navigate("/dashboard/projects");
+          return;
+        }
+
+        if (data) {
+          form.reset({
+            title: data.title,
+            description: data.description || "",
+            category: data.category as any,
+            tags: Array.isArray(data.tags) ? data.tags.join(", ") : data.tags || "",
+            drive_link: data.drive_link || "",
+          });
+          if (data.image_url) {
+            setExistingImages([data.image_url]);
+          }
+        }
+        setLoading(false);
+      };
+
+      fetchProject();
+    }
+  }, [id, navigate, form]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFiles(Array.from(e.target.files));
@@ -46,45 +83,50 @@ export default function ProjectUpload() {
     setFiles(files.filter((_, i) => i !== index));
   };
 
+  const removeExistingImage = (index: number) => {
+    setExistingImages(existingImages.filter((_, i) => i !== index));
+  };
+
   const onSubmit = async (data: ProjectFormValues) => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non authentifié");
 
-      // 1. Get or create portfolio
       let portfolioId;
-      const { data: portfolio } = await (supabase as any)
-        .from('portfolios')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
+      
+      // Only fetch portfolio if creating a new project or if needed
+      if (!id) {
+          const { data: portfolio } = await (supabase as any)
+            .from('portfolios')
+            .select('id')
+            .eq('user_id', user.id)
+            .single();
 
-      if (portfolio) {
-        portfolioId = portfolio.id;
-      } else {
-        // Create default portfolio
-        // Need to fetch username first to generate slug
-        const { data: profile } = await (supabase as any).from('profiles').select('username').eq('id', user.id).single();
-        const slug = profile?.username || `user-${user.id.slice(0, 8)}`;
-        
-        const { data: newPortfolio, error: portfolioError } = await (supabase as any)
-          .from('portfolios')
-          .insert({
-            user_id: user.id,
-            title: "Mon Portfolio",
-            slug: slug,
-            is_published: true
-          })
-          .select()
-          .single();
-        
-        if (portfolioError) throw portfolioError;
-        portfolioId = newPortfolio.id;
+          if (portfolio) {
+            portfolioId = portfolio.id;
+          } else {
+            const { data: profile } = await (supabase as any).from('profiles').select('username').eq('id', user.id).single();
+            const slug = profile?.username || `user-${user.id.slice(0, 8)}`;
+            
+            const { data: newPortfolio, error: portfolioError } = await (supabase as any)
+              .from('portfolios')
+              .insert({
+                user_id: user.id,
+                title: "Mon Portfolio",
+                slug: slug,
+                is_published: true
+              })
+              .select()
+              .single();
+            
+            if (portfolioError) throw portfolioError;
+            portfolioId = newPortfolio.id;
+          }
       }
 
       // 2. Upload files to Supabase Storage
-      const mediaUrls: string[] = [];
+      const mediaUrls: string[] = [...existingImages];
       for (const file of files) {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
@@ -103,32 +145,44 @@ export default function ProjectUpload() {
         mediaUrls.push(publicUrl);
       }
 
-      // 3. Insert project into database
+      // 3. Insert or Update project
       const tagsArray = data.tags.split(",").map(s => s.trim()).filter(Boolean);
 
-      const { error } = await (supabase as any)
-        .from('projects')
-        .insert({
-          portfolio_id: portfolioId,
-          user_id: user.id,
-          title: data.title,
-          description: data.description,
-          category: data.category,
-          tags: tagsArray,
-          drive_link: data.drive_link,
-          image_url: mediaUrls[0] || null, // Map to image_url
-          project_url: data.drive_link, // Map drive_link to project_url for now or add column
-          cover_url: mediaUrls[0] || null,
-          created_at: new Date().toISOString(),
-        });
+      const projectData = {
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        tags: tagsArray,
+        drive_link: data.drive_link,
+        image_url: mediaUrls[0] || null,
+        project_url: data.drive_link,
+        cover_url: mediaUrls[0] || null,
+      };
 
-      if (error) throw error;
+      if (id) {
+        const { error } = await supabase
+          .from('projects')
+          .update(projectData)
+          .eq('id', id);
+        if (error) throw error;
+        alert("Projet mis à jour avec succès !");
+      } else {
+        const { error } = await (supabase as any)
+          .from('projects')
+          .insert({
+            ...projectData,
+            portfolio_id: portfolioId,
+            user_id: user.id,
+            created_at: new Date().toISOString(),
+          });
+        if (error) throw error;
+        alert("Projet ajouté avec succès !");
+      }
 
-      alert("Projet ajouté avec succès !");
       navigate("/dashboard/projects");
     } catch (error: any) {
       console.error(error);
-      alert("Erreur lors de l'ajout du projet : " + error.message);
+      alert("Erreur lors de l'enregistrement du projet : " + error.message);
     } finally {
       setLoading(false);
     }
@@ -137,7 +191,7 @@ export default function ProjectUpload() {
   return (
     <div className="max-w-3xl mx-auto space-y-10">
       <div>
-        <h1 className="text-4xl font-extrabold text-dark mb-2 tracking-tight">Ajouter un projet</h1>
+        <h1 className="text-4xl font-extrabold text-dark mb-2 tracking-tight">{id ? "Modifier le projet" : "Ajouter un projet"}</h1>
         <p className="text-gray-500 text-lg">Partagez vos meilleures réalisations avec le monde.</p>
       </div>
 
@@ -214,13 +268,29 @@ export default function ProjectUpload() {
                 <p className="text-xs text-gray-400 mt-4 font-medium uppercase tracking-wide">PNG, JPG, MP4 jusqu'à 10MB</p>
               </div>
 
-              {files.length > 0 && (
+              {(files.length > 0 || existingImages.length > 0) && (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {files.map((file, index) => (
-                    <div key={index} className="relative group bg-gray-50 p-3 rounded-xl border border-gray-100">
+                  {existingImages.map((url, index) => (
+                    <div key={`existing-${index}`} className="relative group bg-gray-50 p-3 rounded-xl border border-gray-100">
                       <div className="flex items-center space-x-3">
                         <div className="h-10 w-10 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
-                          {/* Preview if image */}
+                          <img src={url} alt="preview" className="h-full w-full object-cover" />
+                        </div>
+                        <span className="text-sm font-medium text-gray-700 truncate flex-1">Image existante</span>
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={() => removeExistingImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                  {files.map((file, index) => (
+                    <div key={`new-${index}`} className="relative group bg-gray-50 p-3 rounded-xl border border-gray-100">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-10 w-10 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
                           {file.type.startsWith('image/') ? (
                             <img src={URL.createObjectURL(file)} alt="preview" className="h-full w-full object-cover" />
                           ) : (
@@ -253,7 +323,7 @@ export default function ProjectUpload() {
 
             <div className="flex justify-end pt-6">
               <Button type="submit" size="lg" className="px-8 py-6 text-lg font-bold shadow-lg shadow-primary/20 rounded-full" disabled={loading}>
-                {loading ? "Publication..." : "Publier le projet"}
+                {loading ? "Enregistrement..." : (id ? "Mettre à jour" : "Publier le projet")}
               </Button>
             </div>
           </form>

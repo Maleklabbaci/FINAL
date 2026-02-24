@@ -10,6 +10,7 @@ import ProjectUpload from "@/pages/dashboard/ProjectUpload";
 import Stats from "@/pages/dashboard/Stats";
 import Settings from "@/pages/dashboard/Settings";
 import PublicPortfolio from "@/pages/PublicPortfolio";
+import ProjectDetails from "@/pages/ProjectDetails";
 import Explorer from "@/pages/Explorer";
 
 // Admin Imports
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/signup" element={<Auth />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/u/:username" element={<PublicPortfolio />} />
+        <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/explorer" element={<Explorer />} />
         
         {/* Dashboard Routes */}
@@ -38,6 +40,7 @@ export default function App() {
           <Route path="profile" element={<ProfileSetup />} />
           <Route path="projects" element={<Projects />} />
           <Route path="projects/new" element={<ProjectUpload />} />
+          <Route path="projects/edit/:id" element={<ProjectUpload />} />
           <Route path="stats" element={<Stats />} />
           <Route path="settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

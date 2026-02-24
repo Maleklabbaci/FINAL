@@ -129,8 +129,14 @@ export default function Explorer() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {profiles.map((profile) => (
               <Link to={`/u/${profile.username}`} key={profile.id} className="block group h-full">
-                <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 hover:-translate-y-2 border border-gray-100 h-full flex flex-col">
-                  <div className="h-28 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 transition-colors"></div>
+                <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 hover:-translate-y-2 border border-gray-100 h-full flex flex-col relative">
+                  <div className="h-28 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 transition-colors relative">
+                    {profile.plan && profile.plan !== 'free' && (
+                      <span className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm z-10">
+                        {profile.plan}
+                      </span>
+                    )}
+                  </div>
                   <div className="px-8 pb-8 relative flex-grow flex flex-col">
                     <div className="absolute -top-12 left-8 h-24 w-24 rounded-2xl border-4 border-white bg-white overflow-hidden shadow-md group-hover:scale-105 transition-transform duration-300">
                       {profile.avatar_url ? (

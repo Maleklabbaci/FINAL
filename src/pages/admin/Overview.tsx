@@ -1,25 +1,77 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, UserCheck, DollarSign, UserPlus, TrendingUp } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-
-const data = [
-  { name: '1 Feb', users: 400 },
-  { name: '5 Feb', users: 300 },
-  { name: '10 Feb', users: 550 },
-  { name: '15 Feb', users: 450 },
-  { name: '20 Feb', users: 700 },
-  { name: '25 Feb', users: 900 },
-];
-
-const pieData = [
-  { name: 'Gratuit', value: 800 },
-  { name: 'Pro', value: 150 },
-  { name: 'Agence', value: 50 },
-];
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 const COLORS = ['#94a3b8', '#6C3FE8', '#FFD166'];
 
 export default function AdminOverview() {
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    activeUsers: 0,
+    totalProjects: 0,
+    newUsersToday: 0
+  });
+  const [recentUsers, setRecentUsers] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchStats() {
+      // Total Users
+      const { count: totalUsers } = await (supabase as any)
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+
+      // Active Users (users with at least one project)
+      // This is a rough approximation as we can't easily join count in Supabase JS client without RPC
+      // For now, let's just count profiles again as "active" for demo or use a different metric
+      // Better metric: Total Projects
+      const { count: totalProjects } = await (supabase as any)
+        .from('projects')
+        .select('*', { count: 'exact', head: true });
+
+      // New Users Today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const { count: newUsersToday } = await (supabase as any)
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', today.toISOString());
+
+      // Recent Users
+      const { data: recent } = await (supabase as any)
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      setStats({
+        totalUsers: totalUsers || 0,
+        activeUsers: totalUsers || 0, // Placeholder
+        totalProjects: totalProjects || 0,
+        newUsersToday: newUsersToday || 0
+      });
+      setRecentUsers(recent || []);
+    }
+    fetchStats();
+  }, []);
+
+  // Mock data for charts (hard to generate real time series without backend aggregation)
+  const data = [
+    { name: '1 Feb', users: 400 },
+    { name: '5 Feb', users: 300 },
+    { name: '10 Feb', users: 550 },
+    { name: '15 Feb', users: 450 },
+    { name: '20 Feb', users: 700 },
+    { name: '25 Feb', users: 900 },
+  ];
+
+  const pieData = [
+    { name: 'Gratuit', value: 800 },
+    { name: 'Pro', value: 150 },
+    { name: 'Agence', value: 50 },
+  ];
+
   return (
     <div className="space-y-8">
       <div>
@@ -35,7 +87,7 @@ export default function AdminOverview() {
             <Users className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">12,345</div>
+            <div className="text-2xl font-bold text-gray-900">{stats.totalUsers}</div>
             <p className="text-xs text-green-500 flex items-center mt-1">
               <TrendingUp className="h-3 w-3 mr-1" /> +15% ce mois
             </p>
@@ -43,11 +95,11 @@ export default function AdminOverview() {
         </Card>
         <Card className="border-0 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Utilisateurs Actifs</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">Total Projets</CardTitle>
             <UserCheck className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">8,540</div>
+            <div className="text-2xl font-bold text-gray-900">{stats.totalProjects}</div>
             <p className="text-xs text-green-500 flex items-center mt-1">
               <TrendingUp className="h-3 w-3 mr-1" /> +8% ce mois
             </p>
@@ -59,9 +111,9 @@ export default function AdminOverview() {
             <DollarSign className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">452,000 DA</div>
+            <div className="text-2xl font-bold text-gray-900">0 DA</div>
             <p className="text-xs text-green-500 flex items-center mt-1">
-              <TrendingUp className="h-3 w-3 mr-1" /> +24% ce mois
+              <TrendingUp className="h-3 w-3 mr-1" /> +0% ce mois
             </p>
           </CardContent>
         </Card>
@@ -71,7 +123,7 @@ export default function AdminOverview() {
             <UserPlus className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">145</div>
+            <div className="text-2xl font-bold text-gray-900">{stats.newUsersToday}</div>
             <p className="text-xs text-gray-500 mt-1">Aujourd'hui</p>
           </CardContent>
         </Card>
@@ -144,15 +196,19 @@ export default function AdminOverview() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex items-center justify-between border-b border-gray-50 last:border-0 pb-4 last:pb-0">
+            {recentUsers.map((user) => (
+              <div key={user.id} className="flex items-center justify-between border-b border-gray-50 last:border-0 pb-4 last:pb-0">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold">
-                    U{i}
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold overflow-hidden">
+                    {user.avatar_url ? (
+                      <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
+                    ) : (
+                      user.full_name?.charAt(0) || 'U'
+                    )}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">Utilisateur {i} s'est inscrit</p>
-                    <p className="text-xs text-gray-500">Il y a {i * 5} minutes • Alger</p>
+                    <p className="font-medium text-gray-900">{user.full_name || "Utilisateur"} s'est inscrit</p>
+                    <p className="text-xs text-gray-500">{user.city || "Algérie"}</p>
                   </div>
                 </div>
                 <span className="text-xs font-medium px-2 py-1 bg-green-50 text-green-600 rounded-full">Nouveau</span>

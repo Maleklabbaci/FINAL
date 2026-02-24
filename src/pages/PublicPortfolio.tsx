@@ -132,27 +132,29 @@ export default function PublicPortfolio() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {projects.map((project) => (
-              <div key={project.id} className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 group cursor-pointer hover:-translate-y-2 border border-gray-100 flex flex-col h-full">
-                <div className="aspect-video bg-gray-100 relative overflow-hidden">
-                  {project.cover_url ? (
-                    <img src={project.cover_url} alt={project.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50">
-                      <ExternalLink className="h-12 w-12" />
+              <Link to={`/project/${project.id}`} key={project.id} className="block group h-full">
+                <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 group cursor-pointer hover:-translate-y-2 border border-gray-100 flex flex-col h-full">
+                  <div className="aspect-video bg-gray-100 relative overflow-hidden">
+                    {project.cover_url || project.image_url ? (
+                      <img src={project.cover_url || project.image_url} alt={project.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50">
+                        <ExternalLink className="h-12 w-12" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <span className="bg-white text-dark px-6 py-3 rounded-full font-bold shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Voir le projet</span>
                     </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <span className="bg-white text-dark px-6 py-3 rounded-full font-bold shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Voir le projet</span>
+                  </div>
+                  <div className="p-8 flex-grow flex flex-col">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="font-bold text-xl text-dark group-hover:text-primary transition-colors">{project.title}</h3>
+                      <span className="text-xs font-bold uppercase tracking-wider bg-gray-100 px-3 py-1 rounded-lg text-gray-500">{project.category}</span>
+                    </div>
+                    <p className="text-gray-500 text-base line-clamp-3 leading-relaxed">{project.description}</p>
                   </div>
                 </div>
-                <div className="p-8 flex-grow flex flex-col">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="font-bold text-xl text-dark group-hover:text-primary transition-colors">{project.title}</h3>
-                    <span className="text-xs font-bold uppercase tracking-wider bg-gray-100 px-3 py-1 rounded-lg text-gray-500">{project.category}</span>
-                  </div>
-                  <p className="text-gray-500 text-base line-clamp-3 leading-relaxed">{project.description}</p>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

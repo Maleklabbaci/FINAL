@@ -1,15 +1,56 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Search, Filter, Eye, Flag, Star, Trash2 } from "lucide-react";
-
-const MOCK_PROJECTS = [
-  { id: 1, title: "E-commerce Redesign", owner: "Amine Benali", views: 1205, date: "2024-02-20", image: "https://picsum.photos/seed/1/100/100", featured: true },
-  { id: 2, title: "Brand Identity", owner: "Sarah K.", views: 850, date: "2024-02-19", image: "https://picsum.photos/seed/2/100/100", featured: false },
-  { id: 3, title: "Mobile App UI", owner: "Karim T.", views: 2300, date: "2024-02-18", image: "https://picsum.photos/seed/3/100/100", featured: false },
-  { id: 4, title: "Photography Portfolio", owner: "Lina M.", views: 450, date: "2024-02-15", image: "https://picsum.photos/seed/4/100/100", featured: false },
-];
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function AdminProjects() {
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  async function fetchProjects() {
+    setLoading(true);
+    try {
+      const { data, error } = await (supabase as any)
+        .from('projects')
+        .select('*, profiles(full_name)')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setProjects(data || []);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce projet ?")) return;
+    try {
+      const { error } = await (supabase as any)
+        .from('projects')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      setProjects(projects.filter(p => p.id !== id));
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      alert("Erreur lors de la suppression");
+    }
+  };
+
+  const filteredProjects = projects.filter(project => 
+    project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    project.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
@@ -26,6 +67,8 @@ export default function AdminProjects() {
             <input
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
               placeholder="Rechercher un projet..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <div className="flex gap-2">
@@ -39,30 +82,31 @@ export default function AdminProjects() {
                 <tr>
                   <th className="px-6 py-3">Projet</th>
                   <th className="px-6 py-3">Créateur</th>
-                  <th className="px-6 py-3">Vues</th>
+                  <th className="px-6 py-3">Catégorie</th>
                   <th className="px-6 py-3">Date</th>
                   <th className="px-6 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {MOCK_PROJECTS.map((project) => (
+                {filteredProjects.map((project) => (
                   <tr key={project.id} className="bg-white border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-gray-900 flex items-center gap-3">
-                      <img src={project.image} alt={project.title} className="w-12 h-12 rounded-lg object-cover" />
+                      {project.image_url || project.cover_url ? (
+                        <img src={project.image_url || project.cover_url} alt={project.title} className="w-12 h-12 rounded-lg object-cover" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-400">IMG</div>
+                      )}
                       <div>
                         <div className="font-bold">{project.title}</div>
-                        {project.featured && <span className="text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full font-bold">FEATURED</span>}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-600">{project.owner}</td>
-                    <td className="px-6 py-4 text-gray-600">{project.views}</td>
-                    <td className="px-6 py-4 text-gray-500">{project.date}</td>
+                    <td className="px-6 py-4 text-gray-600">{project.profiles?.full_name || "Inconnu"}</td>
+                    <td className="px-6 py-4 text-gray-600">{project.category}</td>
+                    <td className="px-6 py-4 text-gray-500">{new Date(project.created_at).toLocaleDateString()}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" className={`h-8 w-8 ${project.featured ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}`}><Star className="w-4 h-4" /></Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-blue-600"><Eye className="w-4 h-4" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-red-600"><Flag className="w-4 h-4" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-red-600"><Trash2 className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(project.id)} className="h-8 w-8 text-gray-500 hover:text-red-600"><Trash2 className="w-4 h-4" /></Button>
                       </div>
                     </td>
                   </tr>

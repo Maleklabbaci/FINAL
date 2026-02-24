@@ -83,7 +83,9 @@ export default function Projects() {
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-3 backdrop-blur-sm">
-                  <Button variant="secondary" size="sm" className="rounded-full h-10 w-10 p-0 bg-white hover:bg-white/90 text-dark shadow-lg"><Edit2 className="h-4 w-4" /></Button>
+                  <Link to={`/dashboard/projects/edit/${project.id}`}>
+                    <Button variant="secondary" size="sm" className="rounded-full h-10 w-10 p-0 bg-white hover:bg-white/90 text-dark shadow-lg"><Edit2 className="h-4 w-4" /></Button>
+                  </Link>
                   <Button variant="destructive" size="sm" onClick={() => handleDelete(project.id)} className="rounded-full h-10 w-10 p-0 shadow-lg"><Trash2 className="h-4 w-4" /></Button>
                 </div>
               </div>

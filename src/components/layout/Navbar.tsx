@@ -23,9 +23,6 @@ export function Navbar() {
             <Link to="/explorer" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
               Explorer
             </Link>
-            <Link to="/pricing" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
-              Tarifs
-            </Link>
             <div className="flex items-center space-x-4">
               <Link to="/login">
                 <Button variant="ghost" className="text-gray-700 hover:text-primary hover:bg-primary/5 font-medium">Se connecter</Button>
@@ -57,13 +54,6 @@ export function Navbar() {
               onClick={() => setIsOpen(false)}
             >
               Explorer
-            </Link>
-            <Link 
-              to="/pricing" 
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50"
-              onClick={() => setIsOpen(false)}
-            >
-              Tarifs
             </Link>
             <div className="mt-4 space-y-2 px-3">
               <Link to="/login" onClick={() => setIsOpen(false)}>

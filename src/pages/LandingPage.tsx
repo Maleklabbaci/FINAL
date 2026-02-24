@@ -161,9 +161,11 @@ export default function LandingPage() {
                   <li className="flex items-center text-gray-600"><CheckCircle className="h-5 w-5 text-gray-400 mr-3" /> Sous-domaine portfola.dz</li>
                   <li className="flex items-center text-gray-600"><CheckCircle className="h-5 w-5 text-gray-400 mr-3" /> Support par email</li>
                 </ul>
-                <Button variant="outline" className="w-full h-12 rounded-xl border-gray-200 hover:bg-gray-50 text-gray-900 font-medium">
-                  Commencer gratuitement
-                </Button>
+                <Link to="/signup" className="block w-full">
+                  <Button variant="outline" className="w-full h-12 rounded-xl border-gray-200 hover:bg-gray-50 text-gray-900 font-medium">
+                    Commencer gratuitement
+                  </Button>
+                </Link>
               </div>
 
               {/* Pro Plan */}
@@ -185,9 +187,11 @@ export default function LandingPage() {
                   <li className="flex items-center text-gray-300"><CheckCircle className="h-5 w-5 text-primary mr-3" /> Analytics avancés</li>
                   <li className="flex items-center text-gray-300"><CheckCircle className="h-5 w-5 text-primary mr-3" /> Badge "Vérifié"</li>
                 </ul>
-                <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-medium border-0">
-                  Passer au Pro
-                </Button>
+                <Link to="/signup" className="block w-full">
+                  <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-medium border-0">
+                    Passer au Pro
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
