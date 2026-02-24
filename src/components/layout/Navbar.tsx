@@ -7,11 +7,14 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="glass-nav sticky top-0 z-50 transition-all duration-300">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isOpen ? 'bg-white' : 'bg-white/80 backdrop-blur-md border-b border-white/20'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
-          <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="text-2xl font-extrabold text-primary tracking-tight hover:scale-105 transition-transform">
+          <div className="flex-shrink-0 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-white font-bold text-lg">P</span>
+            </div>
+            <Link to="/" className="text-xl font-bold text-dark tracking-tight hover:opacity-80 transition-opacity">
               Portfola
             </Link>
           </div>
@@ -25,10 +28,10 @@ export function Navbar() {
             </Link>
             <div className="flex items-center space-x-4">
               <Link to="/login">
-                <Button variant="ghost" className="text-gray-600 hover:text-primary font-medium">Se connecter</Button>
+                <Button variant="ghost" className="text-gray-700 hover:text-primary hover:bg-primary/5 font-medium">Se connecter</Button>
               </Link>
               <Link to="/signup">
-                <Button className="bg-primary hover:bg-primary/90 text-white rounded-full px-6 shadow-lg shadow-primary/25 hover:shadow-primary/40">Commencer gratuitement</Button>
+                <Button className="bg-primary hover:bg-primary/90 text-white rounded-full px-6 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:-translate-y-0.5">Commencer</Button>
               </Link>
             </div>
           </div>
@@ -36,7 +39,7 @@ export function Navbar() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-600 hover:text-primary focus:outline-none"
+              className="text-gray-700 hover:text-primary focus:outline-none p-2 rounded-md hover:bg-gray-100"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
