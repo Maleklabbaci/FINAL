@@ -14,6 +14,7 @@ create table public.profiles (
   skills text[],
   whatsapp text,
   role text default 'user',
+  plan text default 'free',
   updated_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   constraint username_length check (char_length(username) >= 3)
@@ -42,6 +43,7 @@ create table public.projects (
   image_url text,
   project_url text,
   category text, -- Added category for projects
+  tags text[], -- Added tags for projects
   cover_url text, -- Added cover_url for projects
   display_order integer default 0,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null

@@ -25,7 +25,7 @@ export default function PublicPortfolio() {
         const { data: profileData, error: profileError } = await (supabase as any)
           .from('profiles')
           .select('*')
-          .eq('username', username)
+          .ilike('username', username)
           .single();
 
         if (profileError) throw profileError;

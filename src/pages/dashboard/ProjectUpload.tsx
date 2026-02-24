@@ -114,7 +114,7 @@ export default function ProjectUpload() {
           title: data.title,
           description: data.description,
           category: data.category,
-          // tags: tagsArray, // Tags not in schema yet, need to add or ignore
+          tags: tagsArray,
           drive_link: data.drive_link,
           image_url: mediaUrls[0] || null, // Map to image_url
           project_url: data.drive_link, // Map drive_link to project_url for now or add column

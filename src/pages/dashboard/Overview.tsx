@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Folder, MousePointerClick, ArrowUpRight, Sparkles, Plus, ExternalLink, Share2, Trophy } from "lucide-react";
+import { Eye, Folder, MousePointerClick, ArrowUpRight, Sparkles, Plus, ExternalLink, Share2, Trophy, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -8,23 +8,38 @@ import { supabase } from "@/lib/supabase";
 export default function Overview() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [projectsCount, setProjectsCount] = useState(0);
+  const [recentProjects, setRecentProjects] = useState<any[]>([]);
+  const [completionPercentage, setCompletionPercentage] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data: profile } = await supabase
+        const { data: profile } = await (supabase as any)
           .from('profiles')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single();
         setUserProfile(profile || { full_name: user.email?.split('@')[0] });
 
-        const { count } = await supabase
+        // Calculate profile completion
+        let completedSteps = 1; // Account created
+        if (profile?.avatar_url) completedSteps++;
+        if (profile?.whatsapp || profile?.linkedin || profile?.behance || profile?.instagram) completedSteps++;
+        
+        const { count, data: projects } = await (supabase as any)
           .from('projects')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id);
+          .select('*', { count: 'exact' })
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(2);
+        
         setProjectsCount(count || 0);
+        setRecentProjects(projects || []);
+
+        if ((count || 0) >= 3) completedSteps++;
+
+        setCompletionPercentage((completedSteps / 4) * 100);
       }
     }
     fetchData();
@@ -59,11 +74,10 @@ export default function Overview() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-extrabold text-dark mb-2">1,234</div>
+            <div className="text-3xl font-extrabold text-dark mb-2">0</div>
             <p className="text-xs text-gray-500 flex items-center font-medium">
-              <span className="text-green-500 flex items-center bg-green-50 px-2 py-0.5 rounded-md mr-2">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                12%
+              <span className="text-gray-400 flex items-center bg-gray-50 px-2 py-0.5 rounded-md mr-2">
+                -
               </span>
               ce mois-ci
             </p>
@@ -80,10 +94,10 @@ export default function Overview() {
           <CardContent>
             <div className="text-3xl font-extrabold text-dark mb-2">{projectsCount}</div>
             <p className="text-xs text-gray-500 font-medium">
-              <span className="text-primary font-bold">{5 - projectsCount}</span> restants (Plan Gratuit)
+              <span className="text-primary font-bold">{Math.max(0, 5 - projectsCount)}</span> restants (Plan Gratuit)
             </p>
             <div className="w-full bg-gray-100 h-1.5 rounded-full mt-3 overflow-hidden">
-              <div className="bg-primary h-full rounded-full transition-all duration-1000" style={{ width: `${(projectsCount / 5) * 100}%` }}></div>
+              <div className="bg-primary h-full rounded-full transition-all duration-1000" style={{ width: `${Math.min(100, (projectsCount / 5) * 100)}%` }}></div>
             </div>
           </CardContent>
         </Card>
@@ -96,11 +110,10 @@ export default function Overview() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-extrabold text-dark mb-2">89</div>
+            <div className="text-3xl font-extrabold text-dark mb-2">0</div>
             <p className="text-xs text-gray-500 flex items-center font-medium">
-              <span className="text-green-500 flex items-center bg-green-50 px-2 py-0.5 rounded-md mr-2">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                5%
+              <span className="text-gray-400 flex items-center bg-gray-50 px-2 py-0.5 rounded-md mr-2">
+                -
               </span>
               ce mois-ci
             </p>
@@ -115,13 +128,12 @@ export default function Overview() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-extrabold text-dark mb-2">#42</div>
+            <div className="text-3xl font-extrabold text-dark mb-2">-</div>
             <p className="text-xs text-gray-500 flex items-center font-medium">
-              <span className="text-green-500 flex items-center bg-green-50 px-2 py-0.5 rounded-md mr-2">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                Top 10%
+              <span className="text-gray-400 flex items-center bg-gray-50 px-2 py-0.5 rounded-md mr-2">
+                -
               </span>
-              Alger
+              {userProfile?.city || "Algérie"}
             </p>
           </CardContent>
         </Card>
@@ -159,21 +171,27 @@ export default function Overview() {
               <Link to="/dashboard/projects" className="text-primary font-medium hover:underline text-sm">Tout voir</Link>
             </div>
             
-            {projectsCount > 0 ? (
+            {recentProjects.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Placeholder for actual projects - in real app would map */}
-                <div className="aspect-video bg-gray-100 rounded-2xl overflow-hidden relative group cursor-pointer">
-                  <img src="https://picsum.photos/seed/1/400/300" alt="Project" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                    <span className="text-white font-bold">Redesign E-commerce</span>
+                {recentProjects.map((project) => (
+                  <div key={project.id} className="aspect-video bg-gray-100 rounded-2xl overflow-hidden relative group cursor-pointer">
+                    {project.image_url || project.cover_url ? (
+                      <img 
+                        src={project.image_url || project.cover_url} 
+                        alt={project.title} 
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105" 
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                        <ImageIcon className="h-12 w-12" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                      <span className="text-white font-bold">{project.title}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="aspect-video bg-gray-100 rounded-2xl overflow-hidden relative group cursor-pointer">
-                  <img src="https://picsum.photos/seed/2/400/300" alt="Project" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                    <span className="text-white font-bold">Campagne Marketing</span>
-                  </div>
-                </div>
+                ))}
               </div>
             ) : (
               <div className="bg-gray-50 rounded-3xl p-8 text-center border border-dashed border-gray-200">
@@ -192,26 +210,26 @@ export default function Overview() {
           <div className="bg-white rounded-3xl border border-gray-100 shadow-lg shadow-gray-200/50 p-8">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-dark">Profil complété</h3>
-              <span className="text-primary font-bold">70%</span>
+              <span className="text-primary font-bold">{completionPercentage}%</span>
             </div>
             <div className="w-full bg-gray-100 h-2 rounded-full mb-6 overflow-hidden">
-              <div className="bg-primary h-full rounded-full" style={{ width: '70%' }}></div>
+              <div className="bg-primary h-full rounded-full transition-all duration-1000" style={{ width: `${completionPercentage}%` }}></div>
             </div>
             <ul className="space-y-3">
-              <li className="flex items-center text-sm text-gray-500 line-through decoration-gray-400">
-                <div className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-xs">✓</div>
+              <li className={`flex items-center text-sm ${true ? 'text-gray-500 line-through decoration-gray-400' : 'text-dark font-medium'}`}>
+                <div className={`w-5 h-5 rounded-full ${true ? 'bg-green-100 text-green-600' : 'border-2 border-gray-300'} flex items-center justify-center mr-3 text-xs`}>{true ? '✓' : ''}</div>
                 Créer un compte
               </li>
-              <li className="flex items-center text-sm text-gray-500 line-through decoration-gray-400">
-                <div className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-xs">✓</div>
+              <li className={`flex items-center text-sm ${userProfile?.avatar_url ? 'text-gray-500 line-through decoration-gray-400' : 'text-dark font-medium'}`}>
+                <div className={`w-5 h-5 rounded-full ${userProfile?.avatar_url ? 'bg-green-100 text-green-600' : 'border-2 border-gray-300'} flex items-center justify-center mr-3 text-xs`}>{userProfile?.avatar_url ? '✓' : ''}</div>
                 Ajouter une photo
               </li>
-              <li className="flex items-center text-sm text-dark font-medium">
-                <div className="w-5 h-5 rounded-full border-2 border-primary mr-3"></div>
+              <li className={`flex items-center text-sm ${projectsCount >= 3 ? 'text-gray-500 line-through decoration-gray-400' : 'text-dark font-medium'}`}>
+                <div className={`w-5 h-5 rounded-full ${projectsCount >= 3 ? 'bg-green-100 text-green-600' : 'border-2 border-primary'} flex items-center justify-center mr-3 text-xs`}>{projectsCount >= 3 ? '✓' : ''}</div>
                 Ajouter 3 projets
               </li>
-              <li className="flex items-center text-sm text-dark font-medium">
-                <div className="w-5 h-5 rounded-full border-2 border-gray-300 mr-3"></div>
+              <li className={`flex items-center text-sm ${(userProfile?.whatsapp || userProfile?.linkedin) ? 'text-gray-500 line-through decoration-gray-400' : 'text-dark font-medium'}`}>
+                <div className={`w-5 h-5 rounded-full ${(userProfile?.whatsapp || userProfile?.linkedin) ? 'bg-green-100 text-green-600' : 'border-2 border-gray-300'} flex items-center justify-center mr-3 text-xs`}>{(userProfile?.whatsapp || userProfile?.linkedin) ? '✓' : ''}</div>
                 Lier les réseaux sociaux
               </li>
             </ul>

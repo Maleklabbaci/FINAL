@@ -22,6 +22,7 @@ export interface Database {
           skills: string[] | null
           whatsapp: string | null
           role: string | null
+          plan: string | null
           updated_at: string | null
           created_at: string
         }
@@ -97,6 +98,7 @@ export interface Database {
           image_url: string | null
           project_url: string | null
           category: string | null
+          tags: string[] | null
           cover_url: string | null
           display_order: number | null
           created_at: string
